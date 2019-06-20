@@ -16,24 +16,26 @@ import * as images from '../assets/images';
 const { width, height } = Dimensions.get('window');
 import Listing from '../component/Explore/Listing';
 import ListHeader from '../component/Explore/ListHeader';
+import { FlatList } from 'react-native-gesture-handler';
 export default class LoginScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      count: 1,
-      isLoading: true,
+      page: 1,
+      isLoading: false,
       dataSource: [],
       error: null,
-      hasMore: true
+      refreshing: false
     };
   }
-  componentDidMount() {
+  makeRemoteRequest() {
     this.setState({
       isLoading: false
     });
     let url =
       'https://api.themoviedb.org/3/movie/popular?api_key=8f7fe35951982ef3b6237168e6231580&language=en-US&page=' +
-      this.state.count;
+      this.state.page;
+    this.setState({ isLoading: true });
     return fetch(url)
       .then(response => response.text()) // Convert to text instead of res.json()
       .then(text => {
@@ -44,15 +46,50 @@ export default class LoginScreen extends Component {
         if (resp.total_results != '0') {
           this.setState({
             isLoading: false,
-            dataSource: resp.results
+            dataSource:
+              this.state.page == 1
+                ? resp.results
+                : [...this.state.dataSource, ...resp.results],
+            error: resp.error || null,
+            isLoading: false,
+            refreshing: false
           });
         }
       })
 
       .catch(error => {
         console.warn(error);
+        this.setState({
+          error,
+          isLoading: false
+        });
       });
   }
+
+  componentDidMount() {
+    this.makeRemoteRequest();
+  }
+  _renderItem = ({ item, index }) => (
+    <Listing
+      imageUri={item.poster_path}
+      popularity={item.popularity}
+      vote_average={item.vote_average}
+      title={item.title}
+      overview={item.overview}
+      release_date={item.release_date}
+      key={item.id}
+    />
+  );
+  // handleReferesh = () => {
+  //   this.setState({ page: 1, refreshing: true }, () => {
+  //     this.makeRemoteRequest();
+  //   });
+  // };
+  handleLoadMore = () => {
+    this.setState({ page: this.state.page + 1 }, () => {
+      this.makeRemoteRequest();
+    });
+  };
   render() {
     if (this.state.isLoading) {
       return (
@@ -67,26 +104,6 @@ export default class LoginScreen extends Component {
         </View>
       );
     } else {
-      let ourData = this.state.dataSource.map((val, key) => {
-        let Image_URL = {
-          uri: 'https://image.tmdb.org/t/p/w500/' + val.poster_path
-        };
-        let popularity = val.popularity;
-        let vote_average = val.vote_average;
-        let title = val.title;
-        let release_date = val.release_date;
-        return (
-          <Listing
-            imageUri={Image_URL}
-            popularity={popularity}
-            vote_average={vote_average}
-            title={title}
-            release_date={release_date}
-            key={key}
-          />
-        );
-      });
-
       return (
         <View style={styles.container}>
           <ImageBackground
@@ -105,16 +122,15 @@ export default class LoginScreen extends Component {
                   marginTop: 20
                 }}
               >
-                {/* <ListHeader name='My List' /> */}
-                <ScrollView
-                  scrollEventThrottle={16}
-                  contentContainerStyle={{
-                    flexGrow: 1,
-                    justifyContent: 'space-around'
-                  }}
-                >
-                  {ourData}
-                </ScrollView>
+                <FlatList
+                  data={this.state.dataSource}
+                  renderItem={this._renderItem}
+                  keyExtractor={(item, index) => item.title}
+                  refreshing={this.state.refreshing}
+                  onRefresh={this.handleReferesh}
+                  onEndReached={this.handleLoadMore}
+                  onEndReachedThreshold={0}
+                />
               </View>
             </ScrollView>
             <View style={styles.secondWrapper} />

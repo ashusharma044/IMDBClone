@@ -19,8 +19,6 @@ export default class category extends Component {
           flex: 1,
           flexDirection: 'row',
           marginHorizontal: 10,
-          width: screenWidth - 20,
-          height: screenHeight - 620,
           justifyContent: 'flex-start',
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
           marginVertical: 10,
@@ -43,10 +41,7 @@ export default class category extends Component {
       >
         <View
           style={{
-            width: screenWidth - 250,
-            height: screenHeight - 640,
-            maxHeight: screenHeight - 640,
-            maxWidth: screenWidth - 250,
+            flexGrow: 0.5,
             borderWidth: 1,
             borderBottomLeftRadius: 10,
             borderBottomRightRadius: 10,
@@ -61,11 +56,11 @@ export default class category extends Component {
           }}
         >
           <Image
-            source={this.props.imageUri}
+            source={{
+              uri: 'https://image.tmdb.org/t/p/w500/' + this.props.imageUri
+            }}
             style={{
-              flex: 1,
-              width: null,
-              height: null,
+              flexGrow: 1,
               resizeMode: 'cover'
             }}
           />
@@ -80,6 +75,7 @@ export default class category extends Component {
         >
           <View
             style={{
+              flex: 1,
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'flex-start'
@@ -106,7 +102,7 @@ export default class category extends Component {
             <Text
               style={{
                 color: '#fff',
-                width: screenWidth / 2 - 30,
+                flex: 1,
                 paddingLeft: 5,
                 paddingRight: 5,
                 fontSize: 14,
@@ -119,9 +115,32 @@ export default class category extends Component {
           </View>
           <View
             style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              marginTop: 5
+            }}
+          >
+            <Text
+              style={{
+                color: '#fff',
+                flex: 1,
+                paddingLeft: 5,
+                paddingRight: 5,
+                fontSize: 14,
+                fontWeight: 'bold'
+              }}
+              numberOfLines={4}
+            >
+              {this.props.overview}
+            </Text>
+          </View>
+          <View
+            style={{
               flex: 1,
               flexDirection: 'row',
-              justifyContent: 'flex-end'
+              justifyContent: 'space-evenly',
+              alignItems: 'flex-end'
             }}
           >
             <View
@@ -129,6 +148,7 @@ export default class category extends Component {
                 flex: 1,
                 flexDirection: 'column',
                 justifyContent: 'flex-end',
+                alignItems: 'center',
                 color: '#fff'
               }}
             >
@@ -136,8 +156,7 @@ export default class category extends Component {
                 style={{
                   justifyContent: 'flex-start',
                   color: '#f00',
-                  marginVertical: 5,
-                  fontWeight: 'bold'
+                  marginVertical: 5
                 }}
               >
                 Release Date
