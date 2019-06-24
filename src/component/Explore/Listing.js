@@ -57,7 +57,7 @@ export default class category extends Component {
         >
           <Image
             source={{
-              uri: 'https://image.tmdb.org/t/p/w500/' + this.props.imageUri
+              uri: 'https://image.tmdb.org/t/p/w500' + this.props.imageUri
             }}
             style={{
               flexGrow: 1,

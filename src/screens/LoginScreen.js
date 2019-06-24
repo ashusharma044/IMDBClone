@@ -28,15 +28,12 @@ export default class LoginScreen extends Component {
       refreshing: false
     };
   }
-  makeRemoteRequest() {
-    this.setState({
-      isLoading: false
-    });
+  async makeRemoteRequest() {
     let url =
       'https://api.themoviedb.org/3/movie/popular?api_key=8f7fe35951982ef3b6237168e6231580&language=en-US&page=' +
       this.state.page;
-    this.setState({ isLoading: true });
-    return fetch(url)
+    this.setState({ isLoading: false });
+    return await fetch(url)
       .then(response => response.text()) // Convert to text instead of res.json()
       .then(text => {
         return text;
@@ -113,26 +110,15 @@ export default class LoginScreen extends Component {
               height: '100%'
             }}
           >
-            <ScrollView
-              style={styles.mainWrapper}
-              showsHorizontalScrollIndicator={false}
-            >
-              <View
-                style={{
-                  marginTop: 20
-                }}
-              >
-                <FlatList
-                  data={this.state.dataSource}
-                  renderItem={this._renderItem}
-                  keyExtractor={(item, index) => item.title}
-                  refreshing={this.state.refreshing}
-                  onRefresh={this.handleReferesh}
-                  onEndReached={this.handleLoadMore}
-                  onEndReachedThreshold={0}
-                />
-              </View>
-            </ScrollView>
+            <FlatList
+              data={this.state.dataSource}
+              renderItem={this._renderItem}
+              keyExtractor={(item, index) => item.id.toString()}
+              refreshing={this.state.refreshing}
+              onRefresh={this.handleReferesh}
+              onEndReached={this.handleLoadMore}
+              onEndReachedThreshold={1}
+            />
             <View style={styles.secondWrapper} />
           </ImageBackground>
         </View>
